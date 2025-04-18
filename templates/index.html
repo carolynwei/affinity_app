@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>抗体-抗原亲和力预测</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      padding: 2em;
+      background: #f0f3f5;
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+    }
+    
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      font-size: 2.5em;
+      margin-bottom: 1.5em;
+      animation: slideIn 1s ease-out forwards;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 3em;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      opacity: 0;
+      animation: fadeIn 1.5s forwards 0.5s;
+    }
+
+    label {
+      display: block;
+      font-size: 1.1em;
+      margin-bottom: 0.5em;
+      font-weight: 600;
+      color: #444;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      margin-bottom: 1.5em;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 8px rgba(52, 152, 219, 0.6);
+    }
+
+    button {
+      padding: 14px 30px;
+      font-size: 18px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      font-weight: 600;
+      margin-top: 1em;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    button:active {
+      transform: scale(1);
+    }
+
+    .progress-container {
+      width: 100%;
+      background-color: #ddd;
+      border-radius: 10px;
+      margin-top: 2em;
+      display: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 12px;
+      background-color: #4CAF50;
+      border-radius: 10px;
+      transition: width 0.4s ease-in-out;
+    }
+
+    #result {
+      margin-top: 1.5em;
+      font-size: 1.3em;
+      color: #27ae60;
+      font-weight: bold;
+      transition: opacity 0.3s ease;
+      opacity: 0;
+      animation: fadeIn 1s forwards 1s;
+    }
+
+    .error {
+      color: #e74c3c;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* 动画效果 */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧬 抗体-抗原亲和力预测平台</h1>
+
+    <label for="light">轻链序列：</label>
+    <textarea id="light" placeholder="输入轻链序列"></textarea>
+
+    <label for="heavy">重链序列：</label>
+    <textarea id="heavy" placeholder="输入重链序列"></textarea>
+
+    <label for="antigen">抗原序列：</label>
+    <textarea id="antigen" placeholder="输入抗原序列"></textarea>
+
+    <button onclick="predict()">预测亲和力</button>
+
+    <!-- 进度条区域 -->
+    <div class="progress-container" id="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div id="result" class="hidden"></div>
+  </div>
+
+  <script>
+    function startProgress() {
+      const container = document.getElementById("progress-container");
+      const bar = document.getElementById("progress-bar");
+      container.style.display = "block";
+      bar.style.width = "0%";
+
+      let width = 0;
+      const fakeProgress = setInterval(() => {
+        if (width >= 90) {
+          clearInterval(fakeProgress);  // 停止模拟进度
+        } else {
+          width += 5;
+          bar.style.width = width + "%";
+        }
+      }, 300);
+      return fakeProgress;
+    }
+
+    function validateInputs(light, heavy, antigen) {
+      if (!light.trim()) {
+        alert("轻链序列不能为空！");
+        return false;
+      }
+      if (!heavy.trim()) {
+        alert("重链序列不能为空！");
+        return false;
+      }
+      if (!antigen.trim()) {
+        alert("抗原序列不能为空！");
+        return false;
+      }
+      return true;
+    }
+
+    async function predict() {
+      const light = document.getElementById('light').value;
+      const heavy = document.getElementById('heavy').value;
+      const antigen = document.getElementById('antigen').value;
+      const resultDiv = document.getElementById('result');
+      const progressBar = document.getElementById('progress-bar');
+      const progressContainer = document.getElementById('progress-container');
+
+      // 验证输入是否为空
+      if (!validateInputs(light, heavy, antigen)) {
+        return;
+      }
+
+      resultDiv.textContent = "正在预测中...";
+      resultDiv.className = "";
+
+      const fakeProgress = startProgress();
+
+      try {
+        const res = await fetch('/api/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ light, heavy, antigen })
+        });
+
+        clearInterval(fakeProgress);
+        progressBar.style.width = "100%";
+        setTimeout(() => {
+          progressContainer.style.display = "none";
+        }, 600);
+
+        const data = await res.json();
+
+        if (res.ok) {
+          resultDiv.textContent = `预测亲和力值为：${data.affinity}`;
+          resultDiv.classList.remove('error');
+        } else {
+          resultDiv.textContent = data.error || "预测失败";
+          resultDiv.classList.add('error');
+        }
+        resultDiv.classList.remove('hidden');
+      } catch (err) {
+        clearInterval(fakeProgress);
+        progressContainer.style.display = "none";
+        resultDiv.textContent = "请求失败，请检查网络连接";
+        resultDiv.classList.add('error');
+        resultDiv.classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
