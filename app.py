@@ -25,11 +25,11 @@ bucket_name = '你的-bucket-名'
 
 # 模型1
 s3_key_1 = 'model/model1231_epoch30.pth'
-local_path_1 = 'model1231_epoch30.pth'
+local_path_1 = os.path.join(os.path.dirname(__file__), 'model1231_epoch30.pth')
 
 # 模型2
 s3_key_2 = 'model/pretrain_bert.models'
-local_path_2 = 'pretrain_bert.models'
+local_path_2 = os.path.join(os.path.dirname(__file__), 'pretrain_bert.models')
 
 # 下载两个模型
 download_model_from_s3(bucket_name, s3_key_1, local_path_1)
