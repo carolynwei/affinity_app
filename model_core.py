@@ -5,6 +5,7 @@ import numpy as np
 from tape import TAPETokenizer
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
+import boto3
 
 def download_model_from_s3(bucket_name, s3_key, local_path):
     try:
