@@ -6,7 +6,7 @@ import os
 
 def download_model_from_s3(bucket_name, s3_key, local_path):
     try:
-        print("🛠️ 开始下载模型...")
+        print("🛠️ 开始下载模型...",flush=True)
         s3 = boto3.client(
             's3',
             aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
@@ -14,13 +14,13 @@ def download_model_from_s3(bucket_name, s3_key, local_path):
             region_name=os.getenv('AWS_REGION')
         )
         if not os.path.exists(local_path):
-            print(f"📦 Downloading {s3_key} from S3...")
+            print(f"📦 Downloading {s3_key} from S3...",flush=True)
             s3.download_file(bucket_name, s3_key, local_path)
-            print(f"✅ Downloaded to {local_path}")
+            print(f"✅ Downloaded to {local_path}"),flush=True)
         else:
-            print(f"✅ Found cached model at {local_path}")
+            print(f"✅ Found cached model at {local_path}",flush=True)
     except Exception as e:
-        print("❌ 下载模型失败：", e)
+        print("❌ 下载模型失败：", e,flush=True)
 
 # 创建 Flask 应用
 app = Flask(__name__)
@@ -36,10 +36,10 @@ s3_key_2 = 'model/pretrain_bert.models'
 local_path_2 = os.path.join(os.path.dirname(__file__), 'pretrain_bert.models')
 
 # 下载两个模型
-print("🧪 准备调用 download_model_from_s3")
+print("🧪 准备调用 download_model_from_s3",flush=True)
 download_model_from_s3(bucket_name, s3_key_1, local_path_1)
 download_model_from_s3(bucket_name, s3_key_2, local_path_2)
-print("✅ download_model_from_s3 已被调用完成")
+print("✅ download_model_from_s3 已被调用完成",flush=True)
 
 # 首页路由：返回前端页面
 @app.route('/')
