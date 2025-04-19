@@ -1,7 +1,7 @@
 import logging
 from flask import Flask, request, jsonify, render_template
 from model_core import predict_affinity
-import boto3
+
 import os
 
 # 初始化 Flask 应用
