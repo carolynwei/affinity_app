@@ -7,8 +7,8 @@ import pandas as pd
 
 # ============ 加载模型 ============
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-pretrain_model_path = './pretrain_bert.models'
-model_path = './model1231_epoch30.pth'
+pretrain_model_path  = os.path.join(os.path.dirname(__file__), 'pretrain_bert.models')
+model_path  = os.path.join(os.path.dirname(__file__), 'model1231_epoch30.pth')
 aaindex_path = './aaindex_pca.csv'
 
 pretrain_model = torch.load(pretrain_model_path, weights_only=False)
