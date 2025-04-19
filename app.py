@@ -19,37 +19,6 @@ console_handler.setFormatter(formatter)
 # 添加处理器到 Flask 的日志系统
 app.logger.addHandler(console_handler)
 
-def download_model_from_s3(bucket_name, s3_key, local_path):
-    try:
-        app.logger.info("🛠️ 开始下载模型...")
-        s3 = boto3.client(
-            's3',
-            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-            region_name=os.getenv('AWS_REGION')
-        )
-        if not os.path.exists(local_path):
-            app.logger.info(f"📦 Downloading {s3_key} from S3...")
-            s3.download_file(bucket_name, s3_key, local_path)
-            app.logger.info(f"✅ Downloaded to {local_path}")
-        else:
-            app.logger.info(f"✅ Found cached model at {local_path}")
-    except Exception as e:
-        app.logger.error(f"❌ 下载模型失败：{e}")
-
-# 设置 bucket 和模型路径
-bucket_name = 'my-antibody-app'
-s3_key_1 = 'model/model1231_epoch30.pth'
-local_path_1 = os.path.join(os.path.dirname(__file__), 'model1231_epoch30.pth')
-
-s3_key_2 = 'model/pretrain_bert.models'
-local_path_2 = os.path.join(os.path.dirname(__file__), 'pretrain_bert.models')
-
-# 下载两个模型
-app.logger.info("🧪 准备调用 download_model_from_s3")
-download_model_from_s3(bucket_name, s3_key_1, local_path_1)
-download_model_from_s3(bucket_name, s3_key_2, local_path_2)
-app.logger.info("✅ download_model_from_s3 已被调用完成")
 
 # 首页路由
 @app.route('/')
