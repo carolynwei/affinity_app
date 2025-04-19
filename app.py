@@ -5,18 +5,22 @@ import boto3
 import os
 
 def download_model_from_s3(bucket_name, s3_key, local_path):
-    s3 = boto3.client(
-    's3',
-    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-    region_name=os.getenv('AWS_REGION')
-    )
-    if not os.path.exists(local_path):
-        print(f"📦 Downloading {s3_key} from S3...")
-        s3.download_file(bucket_name, s3_key, local_path)
-        print(f"✅ Downloaded to {local_path}")
-    else:
-        print(f"✅ Found cached model at {local_path}")
+    try:
+        print("🛠️ 开始下载模型...")
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+            region_name=os.getenv('AWS_REGION')
+        )
+        if not os.path.exists(local_path):
+            print(f"📦 Downloading {s3_key} from S3...")
+            s3.download_file(bucket_name, s3_key, local_path)
+            print(f"✅ Downloaded to {local_path}")
+        else:
+            print(f"✅ Found cached model at {local_path}")
+    except Exception as e:
+        print("❌ 下载模型失败：", e)
 
 # 创建 Flask 应用
 app = Flask(__name__)
