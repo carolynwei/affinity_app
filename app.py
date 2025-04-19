@@ -1,12 +1,12 @@
 # app.py
 from flask import Flask, request, jsonify, render_template
-from model_core import predict_affinity  # 假设你已有这个核心模型函数
+from model_core import predict_affinity
 import boto3
 import os
 
 def download_model_from_s3(bucket_name, s3_key, local_path):
     try:
-        print("🛠️ 开始下载模型...",flush=True)
+        print("🛠️ 开始下载模型...", flush=True)
         s3 = boto3.client(
             's3',
             aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
@@ -14,37 +14,38 @@ def download_model_from_s3(bucket_name, s3_key, local_path):
             region_name=os.getenv('AWS_REGION')
         )
         if not os.path.exists(local_path):
-            print(f"📦 Downloading {s3_key} from S3...",flush=True)
+            print(f"📦 Downloading {s3_key} from S3...", flush=True)
             s3.download_file(bucket_name, s3_key, local_path)
-            print(f"✅ Downloaded to {local_path}"),flush=True)
+            print(f"✅ Downloaded to {local_path}", flush=True)
         else:
-            print(f"✅ Found cached model at {local_path}",flush=True)
+            print(f"✅ Found cached model at {local_path}", flush=True)
     except Exception as e:
-        print("❌ 下载模型失败：", e,flush=True)
+        print("❌ 下载模型失败：", e, flush=True)
 
-# 创建 Flask 应用
+# 初始化 Flask 应用
 app = Flask(__name__)
 
-bucket_name = '你的-bucket-名'
+# ✅ 日志：确认正在开始模型下载
+print("🧪 准备调用 download_model_from_s3", flush=True)
 
-# 模型1
+# 设置 bucket 和模型路径
+bucket_name = 'my-antibody-app'
 s3_key_1 = 'model/model1231_epoch30.pth'
 local_path_1 = os.path.join(os.path.dirname(__file__), 'model1231_epoch30.pth')
 
-# 模型2
 s3_key_2 = 'model/pretrain_bert.models'
 local_path_2 = os.path.join(os.path.dirname(__file__), 'pretrain_bert.models')
 
 # 下载两个模型
-print("🧪 准备调用 download_model_from_s3",flush=True)
 download_model_from_s3(bucket_name, s3_key_1, local_path_1)
 download_model_from_s3(bucket_name, s3_key_2, local_path_2)
-print("✅ download_model_from_s3 已被调用完成",flush=True)
 
-# 首页路由：返回前端页面
+print("✅ download_model_from_s3 已被调用完成", flush=True)
+
+# 首页路由
 @app.route('/')
 def index():
-    return render_template('index.html')  # 自动从 templates/ 目录加载 index.html
+    return render_template('index.html')
 
 # 预测 API 路由：处理前端 POST 请求
 @app.route('/api/predict', methods=['POST'])
