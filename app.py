@@ -32,8 +32,10 @@ s3_key_2 = 'model/pretrain_bert.models'
 local_path_2 = os.path.join(os.path.dirname(__file__), 'pretrain_bert.models')
 
 # 下载两个模型
+print("🧪 准备调用 download_model_from_s3")
 download_model_from_s3(bucket_name, s3_key_1, local_path_1)
 download_model_from_s3(bucket_name, s3_key_2, local_path_2)
+print("✅ download_model_from_s3 已被调用完成")
 
 # 首页路由：返回前端页面
 @app.route('/')
