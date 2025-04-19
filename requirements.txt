@@ -5,3 +5,4 @@ scikit-learn
 pandas
 flask
 boto3
+gunicorn
