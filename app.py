@@ -1,9 +1,39 @@
 # app.py
 from flask import Flask, request, jsonify, render_template
 from model_core import predict_affinity  # 假设你已有这个核心模型函数
+import boto3
+import os
+
+def download_model_from_s3(bucket_name, s3_key, local_path):
+    s3 = boto3.client(
+    's3',
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+    region_name=os.getenv('AWS_REGION')
+    )
+    if not os.path.exists(local_path):
+        print(f"📦 Downloading {s3_key} from S3...")
+        s3.download_file(bucket_name, s3_key, local_path)
+        print(f"✅ Downloaded to {local_path}")
+    else:
+        print(f"✅ Found cached model at {local_path}")
 
 # 创建 Flask 应用
 app = Flask(__name__)
+
+bucket_name = '你的-bucket-名'
+
+# 模型1
+s3_key_1 = 'model/model1231_epoch30.pth'
+local_path_1 = 'model1231_epoch30.pth'
+
+# 模型2
+s3_key_2 = 'model/pretrain_bert.models'
+local_path_2 = 'pretrain_bert.models'
+
+# 下载两个模型
+download_model_from_s3(bucket_name, s3_key_1, local_path_1)
+download_model_from_s3(bucket_name, s3_key_2, local_path_2)
 
 # 首页路由：返回前端页面
 @app.route('/')
